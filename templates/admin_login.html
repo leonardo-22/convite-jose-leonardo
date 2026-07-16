@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Administrativo</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <main class="page-shell">
+        <section class="form-panel animate-in">
+            <div class="section-title">
+                <p class="eyebrow">Acesso restrito</p>
+                <h1>Área administrativa</h1>
+            </div>
+            <div class="glass-card">
+                <form method="post" action="{{ url_for('admin_ranking') }}">
+                    <label class="field-label" for="password">Senha</label>
+                    <input id="password" name="password" type="password" placeholder="Digite a senha" required />
+                    <button class="button button-primary" type="submit">Entrar</button>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

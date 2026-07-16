@@ -322,6 +322,17 @@ form {
     gap: 18px;
 }
 
+.button-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.button-row .button {
+    width: auto;
+    min-width: 180px;
+}
+
 .field-label {
     font-size: 0.95rem;
     color: #d7dce8;

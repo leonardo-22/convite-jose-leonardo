@@ -36,6 +36,7 @@
                             <div class="rank-stats">
                                 <strong>{{ item.correct }} acertos</strong>
                                 <span>{{ item.time }} • {{ item.score }} pts</span>
+                                <a class="button button-secondary" href="{{ url_for('certificado_por_nome', nome=item.name) }}" style="margin-top: 8px; min-height: 36px; padding: 0 12px; font-size: 0.8rem; width: auto;">Baixar Certificado</a>
                             </div>
                         </div>
                     {% endfor %}

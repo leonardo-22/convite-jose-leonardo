@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Participante</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <main class="page-shell">
+        <section class="form-panel animate-in">
+            <div class="section-title">
+                <p class="eyebrow">Atualização de participante</p>
+                <h1>Editar dados do padrinho</h1>
+            </div>
+
+            <div class="glass-card">
+                {% if error %}
+                    <p class="field-error">{{ error }}</p>
+                {% endif %}
+                <form method="post">
+                    <label class="field-label" for="name">Nome</label>
+                    <input id="name" name="name" type="text" value="{{ participant.name }}" required />
+
+                    <label class="field-label" for="score">Pontuação</label>
+                    <input id="score" name="score" type="number" min="0" step="1" value="{{ participant.score }}" required />
+
+                    <div class="button-row">
+                        <button type="submit" class="button button-primary">Salvar alterações</button>
+                        <a class="button button-secondary" href="{{ url_for('admin_ranking') }}">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+    <script src="/static/js/efeitos.js"></script>
+</body>
+</html>

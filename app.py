@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 RANKING_FILE = "ranking.xlsx"
+ADMIN_PASSWORD = "jose2026"
 INVITE_OPTIONS = {
     "homem": {
         "role": "padrinho",
@@ -97,9 +98,16 @@ def parse_time_string(time_string):
         return 0
 
 
+def normalize_score(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
 def write_ranking_entry(name, score, correct, wrong, time_str, accepted="Não"):
     ensure_ranking_file()
-    workbook = load_workbook(RANKING_FILE)
+    workbook = load_workbook(RANKING_FILE, data_only=True)
     sheet = workbook.active
     timestamp = datetime.datetime.now()
     sheet.append([
@@ -120,7 +128,7 @@ def write_ranking_entry(name, score, correct, wrong, time_str, accepted="Não"):
 def update_ranking_acceptance(row_index):
     if not os.path.exists(RANKING_FILE):
         return False
-    workbook = load_workbook(RANKING_FILE)
+    workbook = load_workbook(RANKING_FILE, data_only=True)
     sheet = workbook.active
     if row_index <= 1 or row_index > sheet.max_row:
         return False
@@ -129,28 +137,71 @@ def update_ranking_acceptance(row_index):
     return True
 
 
-def get_top_ranking(limit=4):
+def get_ranking_entries():
     ensure_ranking_file()
-    workbook = load_workbook(RANKING_FILE)
+    workbook = load_workbook(RANKING_FILE, data_only=True)
     sheet = workbook.active
     entries = []
-    for row in sheet.iter_rows(min_row=2, values_only=True):
+    for row_index, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
         if not row or not any(row):
             continue
         name, score, correct, wrong, time_str, date_str, hour_str, accepted = row[:8]
         entries.append({
-            "name": name,
-            "score": score,
-            "correct": correct,
-            "wrong": wrong,
-            "time": time_str,
-            "date": date_str,
-            "hour": hour_str,
-            "accepted": accepted,
-            "sort_time": parse_time_string(time_str)
+            "row_index": row_index,
+            "name": name or "",
+            "score": normalize_score(score),
+            "correct": correct or 0,
+            "wrong": wrong or 0,
+            "time": time_str or "00:00",
+            "date": date_str or "",
+            "hour": hour_str or "",
+            "accepted": accepted or "Não",
+            "sort_time": parse_time_string(time_str or "00:00")
         })
-    entries.sort(key=lambda item: (-int(item["score"]), item["sort_time"]))
-    return entries[:limit]
+
+    entries.sort(key=lambda item: (-item["score"], item["sort_time"], item["name"].lower()))
+    ranked_entries = []
+    for position, entry in enumerate(entries, start=1):
+        ranked_entry = dict(entry)
+        ranked_entry["position"] = position
+        ranked_entries.append(ranked_entry)
+    return ranked_entries
+
+
+def get_top_ranking(limit=4):
+    return get_ranking_entries()[:limit]
+
+
+def get_participant_by_id(participant_id):
+    for participant in get_ranking_entries():
+        if participant["row_index"] == participant_id:
+            return participant
+    return None
+
+
+def update_ranking_entry(participant_id, name, score):
+    if not os.path.exists(RANKING_FILE):
+        return False
+    workbook = load_workbook(RANKING_FILE, data_only=True)
+    sheet = workbook.active
+    if participant_id <= 1 or participant_id > sheet.max_row:
+        return False
+    sheet.cell(row=participant_id, column=1).value = name
+    sheet.cell(row=participant_id, column=2).value = score
+    workbook.save(RANKING_FILE)
+    return True
+
+
+def delete_ranking_entry(participant_id):
+    if not os.path.exists(RANKING_FILE):
+        return False
+    workbook = load_workbook(RANKING_FILE, data_only=True)
+    sheet = workbook.active
+    if participant_id <= 1 or participant_id > sheet.max_row:
+        return False
+    sheet.delete_rows(participant_id)
+    workbook.save(RANKING_FILE)
+    return True
 
 
 @app.route("/")
@@ -174,6 +225,11 @@ def como_funciona():
     return render_template("como_funciona.html")
 
 
+@app.route("/prosseguir")
+def prosseguir():
+    return redirect(url_for("nome"))
+
+
 @app.route("/certificado")
 def certificado():
     name = session.get("player_name") or "Seu nome"
@@ -185,6 +241,79 @@ def certificado():
         invite_role=invite_info["role"],
         today=datetime.datetime.now().strftime("%d/%m/%Y")
     )
+
+
+@app.route("/certificado/<path:nome>")
+def certificado_por_nome(nome):
+    decoded_name = nome.replace("+", " ")
+    return render_template(
+        "certificado.html",
+        name=decoded_name or "Seu nome",
+        invite_role="padrinho",
+        today=datetime.datetime.now().strftime("%d/%m/%Y")
+    )
+
+
+@app.route("/admin/ranking", methods=["GET", "POST"])
+def admin_ranking():
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        if password == ADMIN_PASSWORD:
+            session["admin_authenticated"] = True
+            return redirect(url_for("admin_ranking"))
+        return render_template("admin_ranking.html", participants=get_ranking_entries(), error="Senha incorreta.")
+
+    if session.get("admin_authenticated"):
+        participants = get_ranking_entries()
+        return render_template("admin_ranking.html", participants=participants)
+
+    return render_template("admin_login.html")
+
+
+@app.route("/logout_admin")
+def logout_admin():
+    session.pop("admin_authenticated", None)
+    return redirect(url_for("admin_ranking"))
+
+
+@app.route("/editar_participante/<int:participant_id>", methods=["GET", "POST"])
+def editar_participante(participant_id):
+    if not session.get("admin_authenticated"):
+        return redirect(url_for("admin_ranking"))
+    participant = get_participant_by_id(participant_id)
+    if not participant:
+        return redirect(url_for("admin_ranking"))
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        score_value = request.form.get("score", "0").strip()
+
+        if not name:
+            return render_template(
+                "editar_participante.html",
+                participant=participant,
+                error="Informe um nome para o participante."
+            )
+
+        try:
+            score = int(score_value)
+        except ValueError:
+            return render_template(
+                "editar_participante.html",
+                participant=participant,
+                error="A pontuação precisa ser um número inteiro."
+            )
+
+        update_ranking_entry(participant_id, name, score)
+        return redirect(url_for("admin_ranking"))
+
+    return render_template("editar_participante.html", participant=participant)
+
+
+@app.route("/excluir_participante/<int:participant_id>", methods=["POST", "GET"])
+def excluir_participante(participant_id):
+    delete_ranking_entry(participant_id)
+    return redirect(url_for("admin_ranking"))
 
 
 @app.route("/nome", methods=["GET", "POST"])

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administração do Ranking</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <style>
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            text-align: left;
+        }
+
+        .admin-table th {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-actions form {
+            margin: 0;
+        }
+
+        .admin-btn {
+            min-height: 40px;
+            width: auto;
+            padding: 0 16px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .admin-btn-edit {
+            background: rgba(94, 164, 255, 0.18);
+            color: #8ec2ff;
+        }
+
+        .admin-btn-delete {
+            background: rgba(240, 82, 82, 0.18);
+            color: #ff9f9f;
+        }
+    </style>
+</head>
+<body>
+    <main class="page-shell">
+        <section class="animate-in">
+            <div class="section-title">
+                <p class="eyebrow">Área administrativa</p>
+                <h1>Gerenciamento do ranking</h1>
+                <p class="hero-text">Edite ou remova participantes diretamente do arquivo de dados do ranking.</p>
+            </div>
+
+            <div class="glass-card">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Nome</th>
+                            <th>Pontuação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participant in participants %}
+                        <tr>
+                            <td>#{{ participant.position }}</td>
+                            <td>{{ participant.name }}</td>
+                            <td>{{ participant.score }} pts</td>
+                            <td>
+                                <div class="admin-actions">
+                                    <a class="button button-secondary admin-btn admin-btn-edit" href="{{ url_for('editar_participante', participant_id=participant.row_index) }}">Editar</a>
+                                    <form action="{{ url_for('excluir_participante', participant_id=participant.row_index) }}" method="post" onsubmit="return confirm('Deseja realmente excluir este participante?');">
+                                        <button class="admin-btn admin-btn-delete" type="submit">Excluir</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4">Nenhum participante cadastrado ainda.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script src="/static/js/efeitos.js"></script>
+</body>
+</html>
