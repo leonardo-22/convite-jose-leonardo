@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ranking - José Leonardo</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <main class="page-shell">
+        <section class="ranking-page animate-in">
+            <div class="section-title">
+                <p class="eyebrow">Ranking exclusivo</p>
+                <h1>Os melhores da experiência</h1>
+                <p class="hero-text">Acompanhe os participantes com mais acertos, tempo e emoção.</p>
+            </div>
+            <div class="ranking-board glass-card">
+                <div class="ranking-list">
+                    {% for item in top_entries %}
+                        <div class="rank-row rank-{{ loop.index }}">
+                            <div class="rank-badge">
+                                {% if loop.index == 1 %}
+                                    <span class="medal medal-gold">🥇</span>
+                                {% elif loop.index == 2 %}
+                                    <span class="medal medal-silver">🥈</span>
+                                {% elif loop.index == 3 %}
+                                    <span class="medal medal-bronze">🥉</span>
+                                {% else %}
+                                    <span class="medal">#{{ loop.index }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="rank-content">
+                                <span class="rank-name">{{ item.name }}</span>
+                                <span class="rank-meta">{{ item.date }} • {{ item.hour }} • Aceitou: {{ item.accepted }}</span>
+                            </div>
+                            <div class="rank-stats">
+                                <strong>{{ item.correct }} acertos</strong>
+                                <span>{{ item.time }} • {{ item.score }} pts</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="/static/js/efeitos.js"></script>
+</body>
+</html>

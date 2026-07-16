@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nome no Ranking - José Leonardo</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    {% include 'partials/menu.html' %}
+    <main class="page-shell">
+        <section class="form-panel animate-in">
+            <div class="form-header">
+                <p class="eyebrow">Seu nome no ranking</p>
+                <h1>Como você deseja aparecer no ranking?</h1>
+            </div>
+            <form action="/nome" method="post" class="glass-card">
+                <label class="field-label" for="player_name">Nome</label>
+                <input id="player_name" name="player_name" type="text" placeholder="Digite seu nome" value="{{ player_name }}" required autofocus />
+                <div class="field-group">
+                    <p class="field-label">Você se identifica como</p>
+                    <div class="gender-switcher">
+                        <label class="radio-button">
+                            <input type="radio" name="player_gender" value="homem" {% if player_gender == 'homem' %}checked{% endif %} />
+                            <span>Homem</span>
+                        </label>
+                        <label class="radio-button">
+                            <input type="radio" name="player_gender" value="mulher" {% if player_gender == 'mulher' %}checked{% endif %} />
+                            <span>Mulher</span>
+                        </label>
+                    </div>
+                </div>
+                {% if error %}
+                    <p class="field-error">{{ error }}</p>
+                {% endif %}
+                <button class="button button-primary" type="submit">Continuar</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

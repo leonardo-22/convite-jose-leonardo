@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz José Leonardo</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    {% include 'partials/menu.html' %}
+    <main class="page-shell">
+        <section class="quiz-shell animate-in">
+            <div class="quiz-header">
+                <div>
+                    <p class="eyebrow">Hello, {{ player_name }}</p>
+                    <h1>Quiz José Leonardo</h1>
+                </div>
+                <div class="stats-row">
+                    <span class="pill">Score: <strong id="scoreValue">0</strong></span>
+                    <span class="pill">Erros: <strong id="errorsValue">0</strong></span>
+                </div>
+            </div>
+            <div class="progress-card glass-card">
+                <div class="progress-top">
+                    <div>
+                        <p class="label">Pergunta <span id="currentQuestion">1</span> de {{ questions|length }}</p>
+                        <p class="label">Cronômetro</p>
+                    </div>
+                    <div class="timer" id="timerValue">20s</div>
+                </div>
+                <div class="progress-bar-background">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <article class="question-card glass-card" id="questionCard">
+                <h2 id="questionText">Carregando pergunta...</h2>
+                <div class="answers-grid" id="answersContainer"></div>
+            </article>
+            <div class="quiz-footer">
+                <p class="small-copy">Mantenha o foco e responda com calma.</p>
+            </div>
+        </section>
+    </main>
+    <script>
+        const QUESTIONS = {{ questions | tojson }};
+    </script>
+    <script src="/static/js/efeitos.js"></script>
+    <script src="/static/js/quiz.js"></script>
+</body>
+</html>

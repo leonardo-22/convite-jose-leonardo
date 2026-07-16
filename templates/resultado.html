@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resultado - José Leonardo</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    {% include 'partials/menu.html' %}
+    <main class="page-shell">
+        <section class="result-shell animate-in">
+            <div class="result-panel glass-card">
+                <p class="eyebrow">Parabéns, {{ name }}</p>
+                <h1>Seu resultado</h1>
+                <div class="result-grid">
+                    <div class="result-stat">
+                        <span>Pontuação</span>
+                        <strong>{{ score }}</strong>
+                    </div>
+                    <div class="result-stat">
+                        <span>Acertos</span>
+                        <strong>{{ correct }}</strong>
+                    </div>
+                    <div class="result-stat">
+                        <span>Erros</span>
+                        <strong>{{ wrong }}</strong>
+                    </div>
+                    <div class="result-stat">
+                        <span>Tempo</span>
+                        <strong>{{ time }}</strong>
+                    </div>
+                </div>
+                <p class="subtle-copy">Seu resultado foi salvo no ranking secreto.</p>
+            </div>
+            <div class="ranking-panel glass-card">
+                <div class="ranking-header">
+                    <p class="eyebrow">TOP 4</p>
+                    <h2>Ranking dos melhores</h2>
+                </div>
+                <div class="ranking-list">
+                    {% for item in top_entries %}
+                        <div class="rank-row">
+                            <div>
+                                <span class="rank-name">{{ item.name }}</span>
+                                <span class="rank-meta">{{ item.date }} • {{ item.hour }} • {{ item.accepted }}</span>
+                            </div>
+                            <strong class="rank-score">{{ item.score }}</strong>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button id="openSurprise" class="button button-primary button-full">VER SURPRESA</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        (function(){
+            const btn = document.getElementById('openSurprise');
+            if (!btn) return;
+            btn.addEventListener('click', function(){
+                try { sessionStorage.setItem('surpriseGesture','1'); } catch(e){}
+                const preloadAudio = new Audio('/static/sounds/background.mp3');
+                preloadAudio.volume = 0.02;
+                preloadAudio.play().catch(() => {}).finally(() => {
+                    setTimeout(() => {
+                        preloadAudio.pause();
+                        window.location.href = '/convite';
+                    }, 200);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

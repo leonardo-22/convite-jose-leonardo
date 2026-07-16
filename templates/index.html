@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> José Leonardo </title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    {% include 'partials/menu.html' %}
+    <main class="page-shell">
+        <section class="hero-panel animate-in">
+            <div class="hero-image-frame">
+                <img src="{{ url_for('static', filename='img/jose.jpeg') }}" alt="Foto do José Leonardo" class="hero-image" />
+            </div>
+            <div class="hero-copy">
+                <p class="eyebrow">Desafio</p>
+                <h1>Você realmente conhece o José Leonardo?</h1>
+                <p class="hero-text">Responda ao desafio, viva uma experiência elegante e descubra seu lugar especial na história do pequeno José Leonardo.</p>
+                <div class="hero-actions">
+                    <a href="/nome" class="button button-primary">COMEÇAR</a>
+                    <a href="/ranking" class="button button-secondary">VER RANKING</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="/static/js/efeitos.js"></script>
+</body>
+</html>
